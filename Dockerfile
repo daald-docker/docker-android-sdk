@@ -1,20 +1,17 @@
-FROM ubuntu:17.04
+# source: https://hub.docker.com/r/runmymind/docker-android-sdk/~/dockerfile/
 
+FROM ubuntu:17.04
 
 
 # ------------------------------------------------------
 # --- Install required tools
 
-RUN apt-get update -qq
-
 # Base (non android specific) tools
 # -> should be added to bitriseio/docker-bitrise-base
 
-# Dependencies to execute Android builds
-#RUN dpkg --add-architecture i386
-#RUN apt-get update -qq
-#RUN DEBIAN_FRONTEND=noninteractive apt-get install -y openjdk-8-jdk libc6:i386 libstdc++6:i386 libgcc1:i386 libncurses5:i386 libz1:i386
-RUN apt-get install -y openjdk-8-jdk wget expect git curl
+RUN apt-get update -qq \
+ && apt-get install -y openjdk-8-jdk wget expect git curl \
+ && apt-get clean
 
 # ------------------------------------------------------
 # --- Download Android SDK tools into $ANDROID_SDK_HOME
@@ -22,15 +19,14 @@ RUN apt-get install -y openjdk-8-jdk wget expect git curl
 RUN useradd -u 1000 -M -s /bin/bash android
 RUN chown 1000 /opt
 
-
 USER android
 ENV ANDROID_SDK_HOME /opt/android-sdk-linux
 ENV ANDROID_HOME /opt/android-sdk-linux
 
-
-RUN cd /opt && wget -q https://dl.google.com/android/android-sdk_r24.4.1-linux.tgz -O android-sdk.tgz
-RUN cd /opt && tar -xvzf android-sdk.tgz
-RUN cd /opt && rm -f android-sdk.tgz
+RUN cd /opt \
+ && wget -q https://dl.google.com/android/android-sdk_r24.4.1-linux.tgz -O android-sdk.tgz \
+ && tar -xvzf android-sdk.tgz \
+ && rm -f android-sdk.tgz
 
 ENV PATH ${PATH}:${ANDROID_SDK_HOME}/tools:${ANDROID_SDK_HOME}/platform-tools:/opt/tools
 
